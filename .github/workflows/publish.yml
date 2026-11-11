@@ -1,0 +1,48 @@
+# Publishes a Lumen release from a "publish/vX.Y.Z" branch.
+# The branch carries the installer split into <100 MB parts + latest.json.
+# This workflow joins the parts, checks the sha256, creates the GitHub Release,
+# and deletes the temporary branch.
+name: Publish Lumen release
+on:
+  push:
+    branches: ['publish/**']
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Join parts and verify
+        run: |
+          set -euo pipefail
+          VER="${GITHUB_REF_NAME#publish/}"
+          echo "VER=$VER" >> "$GITHUB_ENV"
+          mkdir -p out
+          for f in $(ls release/*.part000 | sed 's/\.part000$//'); do
+            name=$(basename "$f")
+            cat "$f".part* > "out/$name"
+          done
+          cp release/latest.json out/latest.json
+          cp release/notes.md notes.md
+          python3 - <<'PY'
+          import json, hashlib, os
+          j = json.load(open('out/latest.json'))
+          assets = [j.get('win')] + list((j.get('mac') or {}).values())
+          for a in assets:
+              if not a: continue
+              name = a['url'].rsplit('/', 1)[1]
+              h = hashlib.sha256(open('out/' + name, 'rb').read()).hexdigest()
+              assert h == a['sha256'], f'sha256 mismatch for {name}'
+              print('ok', name, h[:12])
+          PY
+          ls -la out
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$VER" out/* --title "Lumen ${VER#v}" --notes-file notes.md --target main
+      - name: Remove temporary branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: git push origin --delete "$GITHUB_REF_NAME"
