@@ -1,1 +1,379 @@
-<!doctype html><meta charset=utf-8><title>Lumen</title>Lumen
+<!doctype html>
+<html lang="ka">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#0b0c0f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" href="icon.svg">
+<link rel="manifest" href="manifest.json">
+<title>Lumen პულტი</title>
+<style>
+:root{--bg:#0b0c0f;--p:#14161c;--p2:#1b1e26;--line:#272c36;--t:#eef1f6;--d:#9aa3b2;--m:#6b7383;--a:#6c7cff;--live:#ff5b3a;--ok:#33d17a;--warn:#ffb020}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--t);font:15px/1.4 system-ui,-apple-system,'Segoe UI','Noto Sans Georgian',sans-serif;-webkit-user-select:none;user-select:none;overscroll-behavior:none}
+body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;touch-action:manipulation}
+.hidden{display:none!important}
+header{display:flex;align-items:center;gap:10px;padding:12px 16px 8px;position:sticky;top:0;background:linear-gradient(var(--bg) 70%,transparent);z-index:5}
+header img{width:26px;height:26px}
+header .nm{font-weight:800;letter-spacing:.03em}
+header .pl{flex:1;text-align:right;color:var(--m);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dot{width:9px;height:9px;border-radius:50%;background:#555c69;flex:none}
+.dot.on{background:var(--ok);box-shadow:0 0 10px var(--ok)}
+.dot.bad{background:var(--live)}
+main{padding:0 14px 30px}
+#live{position:relative;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#000;border:2px solid var(--live);box-shadow:0 12px 34px rgba(0,0,0,.5);touch-action:pan-y}
+#live .tag{position:absolute;left:10px;top:10px;background:var(--live);color:#fff;font-size:10.5px;font-weight:800;letter-spacing:.1em;padding:3px 8px;border-radius:5px;z-index:2}
+#live .lab{position:absolute;right:10px;top:10px;background:rgba(0,0,0,.6);font-size:11px;font-weight:700;padding:3px 8px;border-radius:5px;z-index:2;max-width:55%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#live .lab:empty{display:none}
+#live .txt{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;white-space:pre-wrap;padding:30px 16px 16px;font-weight:700;font-size:16px;line-height:1.3;background:radial-gradient(circle at 50% 40%,#1a2236,#07080c)}
+#live img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+#live .blk{position:absolute;inset:0;background:rgba(0,0,0,.82);display:flex;align-items:center;justify-content:center;color:var(--live);font-weight:800;letter-spacing:.06em;z-index:3}
+#live .empty{color:var(--m);font-weight:500;background:#090a0d}
+.cnt{display:flex;justify-content:space-between;margin:8px 2px 0;font-size:12.5px;color:var(--d)}
+.cnt b{color:var(--t);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:70%}
+.next{margin-top:8px;padding:10px 12px;border-radius:11px;background:var(--p);border:1px solid var(--line);font-size:13px;color:var(--d);display:flex;gap:8px;white-space:nowrap;overflow:hidden}
+.next span{color:var(--warn);font-weight:700;font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding-top:1px}
+.next b{font-weight:500;color:var(--t);overflow:hidden;text-overflow:ellipsis}
+.nav{display:grid;grid-template-columns:1fr 2fr;gap:10px;margin-top:12px}
+.nav button{height:74px;border-radius:16px;font-size:17px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px;transition:transform .08s}
+.nav button:active{transform:scale(.97)}
+.nav .prev{background:var(--p2);border:1px solid var(--line)}
+.nav .nx{background:linear-gradient(135deg,#6c7cff,#5163f5);color:#fff;box-shadow:0 8px 24px rgba(91,108,255,.35)}
+.nav svg{width:22px;height:22px}
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.quick button{height:54px;border-radius:12px;background:var(--p);border:1px solid var(--line);font-size:12.5px;font-weight:600;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.quick button:active{background:var(--p2)}
+.quick button.on{border-color:var(--live);color:var(--live);background:rgba(255,91,58,.1)}
+.quick button.on.lg{border-color:var(--a);color:#aab5ff;background:rgba(108,124,255,.12)}
+.quick button:disabled{opacity:.35}
+.quick svg{width:18px;height:18px}
+.tabs{display:flex;margin:18px 0 10px;background:var(--p);border-radius:12px;padding:4px;border:1px solid var(--line)}
+.tabs button{flex:1;height:38px;border-radius:9px;font-weight:600;font-size:13.5px;color:var(--d)}
+.tabs button.on{background:var(--p2);color:var(--t);box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.row{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;background:var(--p);border:1px solid var(--line);margin-bottom:8px}
+.row:active{background:var(--p2)}
+.row.live{border-color:var(--live)}
+.row .ic{width:36px;height:36px;border-radius:9px;background:var(--p2);display:flex;align-items:center;justify-content:center;flex:none;color:var(--d)}
+.row .ic svg{width:18px;height:18px}
+.row .t{flex:1;min-width:0}
+.row .t div:first-child{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .t div:last-child{font-size:12px;color:var(--m)}
+.hdr{font-size:11.5px;font-weight:800;color:var(--warn);letter-spacing:.08em;text-transform:uppercase;margin:16px 4px 8px}
+.slides-h{display:flex;align-items:center;gap:8px;margin:0 2px 10px}
+.slides-h b{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.slides-h button{font-size:12.5px;color:var(--a);font-weight:600}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sl{position:relative;aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:#0d1018;border:2px solid var(--line);text-align:center}
+.sl.on{border-color:var(--live)}
+.sl .x{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:14px 6px 6px;font-size:9.5px;font-weight:600;line-height:1.25;white-space:pre-wrap;overflow:hidden}
+.sl img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.sl .l{position:absolute;left:4px;top:4px;font-size:9px;font-weight:800;padding:1px 5px;border-radius:3px;background:#2f6fd6;color:#fff;max-width:85%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;z-index:2}
+.sl .n{position:absolute;right:5px;bottom:3px;font-size:9.5px;color:var(--m);z-index:2}
+.card{background:var(--p);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.card h3{margin:0 0 10px;font-size:14px;display:flex;align-items:center;gap:8px}
+textarea{width:100%;min-height:84px;border-radius:10px;background:var(--p2);border:1px solid var(--line);color:var(--t);font:15px/1.45 inherit;padding:10px;resize:vertical;-webkit-user-select:text;user-select:text}
+textarea:focus{outline:none;border-color:var(--a)}
+.btn{height:44px;border-radius:11px;background:var(--p2);border:1px solid var(--line);font-weight:600;padding:0 14px}
+.btn.pr{background:var(--a);border-color:transparent;color:#fff}
+.btns{display:flex;gap:8px;margin-top:10px}
+.btns .btn{flex:1}
+.tm{font:800 44px/1 system-ui,sans-serif;text-align:center;font-variant-numeric:tabular-nums;margin:2px 0 10px}
+.tm.run{color:var(--ok)}.tm.end{color:var(--live)}
+.pre{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.pre button{height:38px;border-radius:9px;background:var(--p2);border:1px solid var(--line);font-weight:700;font-size:13px}
+.mus{font-size:13px;color:var(--d);margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gate{position:fixed;inset:0;background:var(--bg);z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;text-align:center}
+.gate img{width:64px;height:64px;margin-bottom:14px}
+.gate h2{margin:0 0 6px}
+.gate p{color:var(--d);margin:0 0 20px;max-width:300px}
+.gate input{width:180px;height:60px;border-radius:14px;border:1px solid var(--line);background:var(--p);color:var(--t);font:800 30px system-ui;text-align:center;letter-spacing:.4em;-webkit-user-select:text;user-select:text}
+.gate input:focus{outline:none;border-color:var(--a)}
+.gate .err{color:var(--live);min-height:22px;margin-top:10px;font-size:13.5px}
+.gate .btn{margin-top:8px;width:180px}
+#nid,#npw{font-size:18px!important;letter-spacing:1px!important;width:min(300px,86vw)!important;margin-bottom:10px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#232733;border:1px solid var(--line);padding:10px 16px;border-radius:12px;font-size:13px;z-index:30;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:1}
+.locked .nav,.locked .quick,.locked .grid,.locked #tPl .row{opacity:.35;pointer-events:none}
+.offline{background:rgba(255,91,58,.12);border:1px solid rgba(255,91,58,.4);color:#ff9a84;border-radius:10px;padding:8px 12px;font-size:12.5px;margin:0 0 10px;text-align:center}
+</style>
+</head>
+<body>
+<div class="gate hidden" id="gate">
+  <img src="icon.svg" alt="">
+  <h2>Lumen პულტი</h2>
+  <p id="gateTxt">შეიყვანე PIN კოდი — ის ჩანს კომპიუტერზე, ღილაკში „ტელეფონი".</p>
+  <input id="nid" class="hidden" autocapitalize="characters" autocomplete="off" placeholder="ID, მაგ. K7F2-QX9P">
+  <input id="npw" class="hidden" type="password" autocomplete="current-password" placeholder="პაროლი">
+  <input id="pin" inputmode="numeric" maxlength="4" autocomplete="one-time-code" placeholder="••••">
+  <div class="err" id="pinErr"></div>
+  <button class="btn pr" id="pinGo">შესვლა</button>
+</div>
+
+<header><img src="icon.svg" alt=""><span class="nm">Lumen</span><span class="dot" id="dot"></span><span class="pl" id="plName"></span></header>
+<main>
+  <div class="offline hidden" id="offline">კავშირი გაწყდა — ვცდილობ ხელახლა…</div>
+  <div class="live" id="live"><span class="tag">LIVE</span><span class="lab" id="lLab"></span><div class="txt empty" id="lTxt">ეკრანზე არაფერია</div><div class="blk hidden" id="lBlk">შავი ეკრანი</div></div>
+  <div class="cnt"><b id="lName">—</b><span id="lN"></span></div>
+  <div class="next"><span>შემდეგი</span><b id="nTxt">—</b></div>
+
+  <div class="nav">
+    <button class="prev" data-c="prev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>წინა</button>
+    <button class="nx" data-c="next">შემდეგი<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+  </div>
+  <div class="quick">
+    <button data-c="black" id="qBlack"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="5" width="18" height="14" rx="2"/></svg>შავი</button>
+    <button data-c="clear"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14"/></svg>სლაიდი</button>
+    <button data-c="logo" id="qLogo" class="lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/></svg>ლოგო</button>
+    <button data-c="clearAll"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>ყველა</button>
+  </div>
+
+  <div class="tabs"><button data-t="pl" class="on">სერვისი</button><button data-t="sl">სლაიდები</button><button data-t="more">მეტი</button></div>
+  <section id="tPl"></section>
+  <section id="tSl" class="hidden"><div class="slides-h"><b id="sName">—</b><button id="sFollow" class="hidden">← LIVE-ზე</button></div><div class="grid" id="sGrid"></div></section>
+  <section id="tMore" class="hidden">
+    <div class="card"><h3>✍️ სწრაფი ტექსტი</h3><textarea id="qt" placeholder="დაწერე — და გაგზავნე ეკრანზე"></textarea><div class="btns"><button class="btn pr" id="qtGo">ეკრანზე</button></div></div>
+    <div class="card"><h3>⏱ ტაიმერი</h3><div class="tm" id="tm">0:00</div>
+      <div class="pre"><button data-tm="60">1წ</button><button data-tm="300">5წ</button><button data-tm="600">10წ</button><button data-tm="900">15წ</button></div>
+      <div class="btns"><button class="btn pr" data-c="timer" id="tmGo">დაწყება</button><button class="btn" data-c="timerReset">თავიდან</button><button class="btn" data-c="timerShow" id="tmShow">ეკრანზე</button></div></div>
+    <div class="card"><h3>🎬 რეპეტიცია</h3><div class="mus">ჩართვისას პროექტორზე არაფერი გადის — შენ და სცენა ყველაფერს ხედავთ.</div><div class="btns"><button class="btn" data-c="rehearsal" id="rhGo">რეპეტიციის ჩართვა</button></div></div>
+    <div class="card"><h3>🎵 მუსიკა</h3><div class="mus" id="mus">არ უკრავს</div><div class="btns"><button class="btn pr" data-c="music" id="muGo">▶ დაკვრა</button><button class="btn" data-c="musicNext">შემდეგი</button><button class="btn" data-c="fade">ჩაქრობა</button></div></div>
+  </section>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const $ = (s) => document.querySelector(s);
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const fmt = (t) => { t = Math.max(0, Math.round(t)); const m = Math.floor(t / 60); return m + ':' + String(t % 60).padStart(2, '0'); };
+  const ICON = {
+    song: '<path d="M4 6h16M4 10.5h16M4 15h11M4 19.5h7"/>',
+    image: '<rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="9" cy="10" r="1.8"/><path d="m21 16-5-5-9 9"/>',
+    video: '<rect x="3" y="5.5" width="13" height="13" rx="2.5"/><path d="m16 10 5-3v10l-5-3"/>',
+    audio: '<path d="M9 18V5.5l11-2V16"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/>',
+    deck: '<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M12 16v4M8 20h8"/>',
+  };
+  const TYPE = { song: 'სიმღერა / ტექსტი', image: 'ფოტო', video: 'ვიდეო', audio: 'აუდიო', deck: 'პრეზენტაცია' };
+  const LABC = (l) => { l = (l || '').toLowerCase(); if (/pre|პრე/.test(l)) return '#d9822b'; if (/chorus|მისამ|ქორუს/.test(l)) return '#d6336c'; if (/bridge|ბრიჯ/.test(l)) return '#8b5cf6'; if (/verse|მუხლ|კუპლ/.test(l)) return '#2f6fd6'; return '#3d4350'; };
+  const ic = (t) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICON[t] || ICON.song}</svg>`;
+
+  // NET = opened from the internet page (https) → connect by ID + password through the main computer's tunnel
+  const NET = location.protocol === 'https:';
+  const qs = new URLSearchParams(location.search);
+  let pin = qs.get('pin') || localStorage.getItem('lumen-pin') || '';
+  if (qs.get('pin')) { localStorage.setItem('lumen-pin', pin); history.replaceState(null, '', location.pathname); }
+  const NS = { get() { try { return JSON.parse(localStorage.getItem('lumen-net') || '{}'); } catch (e) { return {}; } }, set(v) { localStorage.setItem('lumen-net', JSON.stringify(v)); } };
+  const normId = (v) => String(v || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (NET && qs.get('id')) { const n = NS.get(); const id = normId(qs.get('id')); if (n.id !== id) NS.set({ id }); history.replaceState(null, '', location.pathname); }
+  let netPw = null, netUrl = null;
+  const hex2buf = (h) => new Uint8Array(h.match(/../g).map((x) => parseInt(x, 16)));
+  const buf2hex = (b) => Array.from(new Uint8Array(b)).map((x) => x.toString(16).padStart(2, '0')).join('');
+  async function deriveKey(pw, saltHex, iter) {
+    const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pw), 'PBKDF2', false, ['deriveBits']);
+    return new Uint8Array(await crypto.subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt: hex2buf(saltHex), iterations: iter }, base, 256));
+  }
+  async function hmac(keyBytes, msg) {
+    const k = await crypto.subtle.importKey('raw', keyBytes, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+    return buf2hex(await crypto.subtle.sign('HMAC', k, new TextEncoder().encode(msg)));
+  }
+  async function lookup(id) {
+    const topic = 'lumen-' + buf2hex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('lumen-v1|' + id))).slice(0, 32);
+    const r = await fetch((window.LUMEN_NTFY || 'https://ntfy.sh/') + topic + '/json?poll=1&since=all', { cache: 'no-store' });
+    const lines = (await r.text()).trim().split('\n').reverse();
+    for (const l of lines) { try { const m = JSON.parse(l); const u = (m.message || '').trim(); if (m.event === 'message' && /^https:\/\/[a-z0-9-]+\.trycloudflare\.com$/.test(u)) return u; } catch (e) {} }
+    return null;
+  }
+  if (NET) {
+    $('#gateTxt').textContent = 'შეიყვანე მთავარი კომპიუტერის ID და პაროლი — ერთხელ, მერე დაიმახსოვრებს.';
+    $('#pin').classList.add('hidden'); $('#nid').classList.remove('hidden'); $('#npw').classList.remove('hidden');
+  }
+  let ws = null, st = null, retry = 0, openItem = null, slidesCache = {}, timerBase = null;
+
+  function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('on'), 1600); }
+  function send(o) { if (ws && ws.readyState === 1) { ws.send(JSON.stringify(o)); if (navigator.vibrate) navigator.vibrate(8); } else toast('კავშირი არ არის'); }
+
+  function showGate(err) {
+    $('#gate').classList.remove('hidden');
+    $('#pinErr').textContent = err || '';
+    if (NET) { const n = NS.get(); $('#nid').value = n.id ? n.id.slice(0, 4) + '-' + n.id.slice(4) : ''; $('#npw').value = ''; setTimeout(() => (n.id ? $('#npw') : $('#nid')).focus(), 100); return; }
+    setTimeout(() => $('#pin').focus(), 100);
+  }
+  const netGo = () => {
+    const id = normId($('#nid').value), pw = $('#npw').value;
+    if (id.length !== 8) { $('#pinErr').textContent = 'ID 8 სიმბოლოა, მაგ. K7F2-QX9P'; return; }
+    if (!pw) { $('#pinErr').textContent = 'ჩაწერე პაროლი'; return; }
+    const n = NS.get(); if (n.id !== id) NS.set({ id });
+    netPw = pw; netUrl = null; $('#pinErr').textContent = 'ვუკავშირდები…';
+    connect();
+  };
+  $('#npw').addEventListener('keydown', (e) => { if (e.key === 'Enter') netGo(); });
+  $('#nid').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('#npw').focus(); });
+  $('#pinGo').onclick = () => { if (NET) { netGo(); return; } const v = $('#pin').value.trim(); if (!/^\d{4}$/.test(v)) { $('#pinErr').textContent = 'შეიყვანე 4 ციფრი'; return; } pin = v; localStorage.setItem('lumen-pin', pin); $('#gate').classList.add('hidden'); connect(); };
+  $('#pin').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('#pinGo').click(); });
+
+  let connecting = false;
+  const ready = () => { retry = 0; $('#gate').classList.add('hidden'); $('#dot').className = 'dot on'; $('#offline').classList.add('hidden'); send({ t: 'hello' }); if (openItem) send({ t: 'slides', itemId: openItem }); };
+  const onMsg = (ev) => { let m; try { m = JSON.parse(ev.data); } catch (e) { return; } if (m.t === 'state') { st = m; render(); } if (m.t === 'slides') { slidesCache[m.itemId] = m; renderSlides(); } };
+  async function connect() {
+    if (connecting || (ws && ws.readyState <= 1)) return;
+    if (!NET) {
+      if (!pin) { showGate(); return; }
+      try { ws = new WebSocket(`ws://${location.host}/ws?pin=${encodeURIComponent(pin)}`); } catch (e) { return later(); }
+      ws.onopen = ready;
+      ws.onmessage = onMsg;
+      ws.onclose = (ev) => {
+        $('#dot').className = 'dot bad';
+        if (ev.code === 4001) { localStorage.removeItem('lumen-pin'); pin = ''; showGate('PIN არასწორია ან შეიცვალა'); return; }
+        $('#offline').classList.remove('hidden');
+        later();
+      };
+      return;
+    }
+    const n = NS.get();
+    if (!n.id || (!netPw && !n.key)) { showGate(); return; }
+    connecting = true;
+    try { if (!netUrl) netUrl = await lookup(n.id); } catch (e) { netUrl = null; }
+    connecting = false;
+    if (!netUrl) {
+      if (!$('#gate').classList.contains('hidden')) { $('#pinErr').textContent = 'ამ ID-ით ჩართული კომპიუტერი ვერ ვიპოვე'; return; }
+      $('#dot').className = 'dot bad'; $('#offline').classList.remove('hidden'); return later();
+    }
+    let authed = false;
+    try { ws = new WebSocket(netUrl.replace(/^https:/, 'wss:') + '/ws'); } catch (e) { netUrl = null; return later(); }
+    const me = ws;
+    ws.onmessage = async (ev) => {
+      if (authed) return onMsg(ev);
+      let m; try { m = JSON.parse(ev.data); } catch (e) { return; }
+      if (m.t === 'hello') {
+        let key;
+        const cur = NS.get();
+        if (netPw) key = await deriveKey(netPw, m.salt, m.iter);
+        else if (cur.key && cur.salt === m.salt) key = hex2buf(cur.key);
+        else { netPw = null; NS.set({ id: cur.id }); me.close(); showGate('პაროლი შეიცვალა — ჩაწერე ახალი'); return; }
+        me._k = { salt: m.salt, key: buf2hex(key) };
+        me.send(JSON.stringify({ t: 'auth', proof: await hmac(key, m.nonce) }));
+      } else if (m.t === 'auth-ok') {
+        authed = true; netPw = null;
+        NS.set({ id: NS.get().id, salt: me._k.salt, key: me._k.key });
+        ready();
+      }
+    };
+    ws.onclose = (ev) => {
+      if (ws !== me) return;
+      $('#dot').className = 'dot bad';
+      if (ev.code === 4001) { netPw = null; NS.set({ id: NS.get().id }); showGate('პაროლი არასწორია'); return; }
+      if (ev.code === 4003) { showGate('ძალიან ბევრი მცდელობა — სცადე 15 წუთში'); return; }
+      if (!authed) netUrl = null; // the address may have changed — look it up again
+      if (!$('#gate').classList.contains('hidden')) { $('#pinErr').textContent = 'ვერ დავუკავშირდი — მთავარი კომპიუტერი ჩართულია?'; return; }
+      $('#offline').classList.remove('hidden');
+      later();
+    };
+  }
+  function later() { retry++; setTimeout(connect, Math.min(5000, 600 * retry)); }
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && (!ws || ws.readyState > 1)) connect(); });
+
+  function render() {
+    if (!st) return;
+    $('#plName').textContent = (st.locked ? '🔒 ჩაკეტილია · ' : '') + (st.pl ? st.pl.name : '');
+    document.body.classList.toggle('locked', !!st.locked);
+    const tg = document.querySelector('#live .tag');
+    tg.textContent = st.rehearsal ? 'რეპეტიცია' : 'LIVE';
+    tg.style.background = st.rehearsal ? '#ffb020' : ''; tg.style.color = st.rehearsal ? '#111' : '';
+    $('#live').style.borderColor = st.rehearsal ? '#ffb020' : '';
+    $('#rhGo').textContent = st.rehearsal ? 'რეპეტიციის დასრულება → LIVE' : 'რეპეტიციის ჩართვა';
+    $('#rhGo').className = 'btn' + (st.rehearsal ? ' pr' : '');
+    const L = st.live;
+    const txt = $('#lTxt');
+    $('#live').querySelectorAll('img').forEach((i) => i.remove());
+    if (!L) { txt.className = 'txt empty'; txt.textContent = 'ეკრანზე არაფერია'; $('#lLab').textContent = ''; }
+    else if (L.thumb) { txt.className = 'txt hidden'; const im = document.createElement('img'); im.src = L.thumb; $('#live').insertBefore(im, $('#lBlk')); $('#lLab').textContent = L.label || ''; }
+    else { txt.className = 'txt'; txt.textContent = L.text || ''; $('#lLab').textContent = L.label || ''; }
+    $('#lLab').style.background = L && L.label ? LABC(L.label) : '';
+    $('#lBlk').classList.toggle('hidden', !st.black);
+    $('#lName').textContent = L ? L.name || '' : '—';
+    $('#lN').textContent = L && L.n > 1 ? `${L.index + 1} / ${L.n}` : '';
+    const N = st.next;
+    $('#nTxt').textContent = N ? (N.text ? N.text.split('\n')[0] : '') + (N.itemId && L && N.itemId !== L.itemId ? `  (${N.name})` : '') || N.name || '' : 'სერვისის ბოლო';
+    $('#qBlack').classList.toggle('on', st.black);
+    $('#qLogo').classList.toggle('on', st.logo);
+    $('#qLogo').disabled = !st.hasLogo;
+    // playlist
+    const box = $('#tPl');
+    box.innerHTML = '';
+    if (!st.pl || !st.pl.entries.length) box.innerHTML = '<div class="row"><div class="t"><div>სერვისი ცარიელია</div><div>დაამატე კომპიუტერიდან</div></div></div>';
+    else st.pl.entries.forEach((e) => {
+      if (e.header != null) { box.insertAdjacentHTML('beforeend', `<div class="hdr">${esc(e.header)}</div>`); return; }
+      const r = document.createElement('div');
+      r.className = 'row' + (L && L.entryId === e.eid ? ' live' : '');
+      r.innerHTML = `<div class="ic">${ic(e.type)}</div><div class="t"><div>${esc(e.name)}</div><div>${TYPE[e.type] || ''}${e.n > 1 ? ' · ' + e.n + ' სლაიდი' : ''}</div></div>`;
+      r.onclick = () => {
+        if (e.type === 'audio') { send({ t: 'live', itemId: e.itemId, entryId: e.eid, index: 0 }); toast('🎵 ' + e.name); return; }
+        openItem = e.itemId; openEntry = e.eid; send({ t: 'slides', itemId: e.itemId }); setTab('sl'); renderSlides();
+      };
+      box.appendChild(r);
+    });
+    // follow live
+    if (!openItem && L && L.itemId && !slidesCache[L.itemId]) send({ t: 'slides', itemId: L.itemId });
+    renderSlides();
+    // timer + music
+    timerBase = { rem: st.timer.rem, at: Date.now(), running: st.timer.running, started: st.timer.started };
+    $('#tmGo').textContent = st.timer.running ? 'პაუზა' : 'დაწყება';
+    $('#tmShow').classList.toggle('pr', st.timer.show);
+    $('#mus').textContent = st.music ? '🎵 ' + st.music.name : 'არ უკრავს';
+    $('#muGo').textContent = st.music && st.music.playing ? '⏸ პაუზა' : '▶ დაკვრა';
+  }
+  let openEntry = null;
+  function renderSlides() {
+    const L = st && st.live;
+    const id = openItem || (L && L.itemId);
+    const data = id && slidesCache[id];
+    $('#sFollow').classList.toggle('hidden', !openItem || !L || openItem === L.itemId);
+    const g = $('#sGrid');
+    if (!data) { $('#sName').textContent = id ? 'იტვირთება…' : 'აირჩიე სერვისიდან'; g.innerHTML = ''; return; }
+    $('#sName').textContent = data.name;
+    const entry = openItem ? openEntry : L && L.entryId;
+    g.innerHTML = '';
+    data.slides.forEach((s, i) => {
+      if (!s) return;
+      const b = document.createElement('button');
+      b.className = 'sl' + (L && L.itemId === id && L.index === i ? ' on' : '');
+      b.innerHTML = (s.label ? `<span class="l" style="background:${LABC(s.label)}">${esc(s.label)}</span>` : '') + (s.thumb ? `<img src="${s.thumb}" alt="">` : `<div class="x">${esc(s.text || '')}</div>`) + `<span class="n">${i + 1}</span>`;
+      b.onclick = () => send({ t: 'live', itemId: id, entryId: entry || null, index: i });
+      g.appendChild(b);
+    });
+    const on = g.querySelector('.sl.on');
+    if (on && !$('#tSl').classList.contains('hidden') && !renderSlides._scrolled) { on.scrollIntoView({ block: 'nearest' }); }
+  }
+  $('#sFollow').onclick = () => { openItem = null; openEntry = null; renderSlides(); };
+
+  function setTab(t) {
+    document.querySelectorAll('.tabs button').forEach((b) => b.classList.toggle('on', b.dataset.t === t));
+    $('#tPl').classList.toggle('hidden', t !== 'pl');
+    $('#tSl').classList.toggle('hidden', t !== 'sl');
+    $('#tMore').classList.toggle('hidden', t !== 'more');
+  }
+  document.querySelector('.tabs').onclick = (e) => { const b = e.target.closest('button'); if (b) setTab(b.dataset.t); };
+  document.addEventListener('click', (e) => { const b = e.target.closest('[data-c]'); if (b) send({ t: b.dataset.c }); const p = e.target.closest('[data-tm]'); if (p) send({ t: 'timerSet', sec: +p.dataset.tm }); });
+  $('#qtGo').onclick = () => { const v = $('#qt').value.trim(); if (v) { send({ t: 'quick', text: v }); toast('გაიგზავნა ეკრანზე'); } };
+
+  // swipe on the live preview
+  let sx = null;
+  $('#live').addEventListener('touchstart', (e) => { sx = e.touches[0].clientX; }, { passive: true });
+  $('#live').addEventListener('touchend', (e) => { if (sx == null) return; const dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 50) send({ t: dx < 0 ? 'next' : 'prev' }); sx = null; });
+
+  setInterval(() => {
+    if (!timerBase) return;
+    const rem = timerBase.running ? timerBase.rem - (Date.now() - timerBase.at) / 1000 : timerBase.rem;
+    const el = $('#tm');
+    el.textContent = fmt(rem);
+    el.className = 'tm' + (timerBase.running && rem > 0 ? ' run' : '') + (timerBase.started && rem <= 0 ? ' end' : '');
+  }, 250);
+
+  connect();
+})();
+</script>
+</body>
+</html>
