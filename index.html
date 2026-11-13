@@ -278,7 +278,9 @@ textarea:focus{outline:none;border-color:var(--a)}
   function render() {
     if (!st) return;
     $('#plName').textContent = (st.locked ? '🔒 ჩაკეტილია · ' : '') + (st.pl ? st.pl.name : '');
-    document.body.classList.toggle('locked', !!st.locked);
+    document.body.classList.toggle('locked', !!st.locked && !NET); // password (internet) phones keep control while the computer is locked
+    if (NET && st.lockAlert && window._al !== undefined && st.lockAlert.n !== window._al) toast('🚨 მთავარ კომპიუტერთან ვიღაც არასწორ პაროლს კრეფს');
+    window._al = st.lockAlert ? st.lockAlert.n : 0;
     const tg = document.querySelector('#live .tag');
     tg.textContent = st.rehearsal ? 'რეპეტიცია' : 'LIVE';
     tg.style.background = st.rehearsal ? '#ffb020' : ''; tg.style.color = st.rehearsal ? '#111' : '';
