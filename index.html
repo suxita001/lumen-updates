@@ -183,7 +183,15 @@ textarea:focus{outline:none;border-color:var(--a)}
     const topic = 'lumen-' + buf2hex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('lumen-v1|' + id))).slice(0, 32);
     const r = await fetch((window.LUMEN_NTFY || 'https://ntfy.sh/') + topic + '/json?poll=1&since=all', { cache: 'no-store' });
     const lines = (await r.text()).trim().split('\n').reverse();
-    for (const l of lines) { try { const m = JSON.parse(l); const u = (m.message || '').trim(); if (m.event === 'message' && /^https:\/\/[a-z0-9-]+\.trycloudflare\.com$/.test(u)) return u; } catch (e) {} }
+    const RE = /^https:\/\/[a-z0-9-]+\.trycloudflare\.com$/;
+    for (const l of lines) {
+      try {
+        const m = JSON.parse(l); if (m.event !== 'message') continue;
+        const u = (m.message || '').trim();
+        if (RE.test(u)) return u;
+        const o = JSON.parse(u); if (o && RE.test(o.u || '')) return o.u;
+      } catch (e) {}
+    }
     return null;
   }
   if (NET) {
@@ -215,6 +223,9 @@ textarea:focus{outline:none;border-color:var(--a)}
   $('#pin').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('#pinGo').click(); });
 
   let connecting = false;
+  // dead-link watchdog: the computer sends a heartbeat every ~15 s
+  setInterval(() => { if (NET && ws && ws.readyState === 1 && ws.last && Date.now() - ws.last > 35000) { try { ws.close(); } catch (e) {} } }, 5000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && (!ws || ws.readyState > 1)) { retry = 0; connect(); } });
   const ready = () => { retry = 0; $('#gate').classList.add('hidden'); $('#dot').className = 'dot on'; $('#offline').classList.add('hidden'); send({ t: 'hello' }); if (openItem) send({ t: 'slides', itemId: openItem }); };
   const onMsg = (ev) => { let m; try { m = JSON.parse(ev.data); } catch (e) { return; } if (m.t === 'state') { st = m; render(); } if (m.t === 'slides') { slidesCache[m.itemId] = m; renderSlides(); } };
   async function connect() {
@@ -245,6 +256,7 @@ textarea:focus{outline:none;border-color:var(--a)}
     try { ws = new WebSocket(netUrl.replace(/^https:/, 'wss:') + '/ws'); } catch (e) { netUrl = null; return later(); }
     const me = ws;
     ws.onmessage = async (ev) => {
+      me.last = Date.now();
       if (authed) return onMsg(ev);
       let m; try { m = JSON.parse(ev.data); } catch (e) { return; }
       if (m.t === 'hello') {
