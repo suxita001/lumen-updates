@@ -98,6 +98,28 @@ textarea:focus{outline:none;border-color:var(--a)}
 .toast.on{opacity:1}
 .locked .nav,.locked .quick,.locked .grid,.locked #tPl .row{opacity:.35;pointer-events:none}
 .offline{background:rgba(255,91,58,.12);border:1px solid rgba(255,91,58,.4);color:#ff9a84;border-radius:10px;padding:8px 12px;font-size:12.5px;margin:0 0 10px;text-align:center}
+/* web page on screen: live picture you can tap, drag-scroll and type into */
+.webbtn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:46px;margin:0 0 12px;border-radius:12px;background:var(--a);color:#fff;font-weight:700}
+.medbar{background:var(--p);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:0 0 12px}
+.medbar .r{display:flex;align-items:center;gap:8px}
+.medbar .nm{flex:1;min-width:0;font-size:12.5px;color:var(--d);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.medbar button{height:36px;min-width:44px;border-radius:9px;background:var(--p2);border:1px solid var(--line);font-weight:700}
+.medbar input[type=range]{flex:1;accent-color:var(--a)}
+.medbar .tt{font-size:11.5px;color:var(--m);font-variant-numeric:tabular-nums;min-width:34px;text-align:center}
+.wv{position:fixed;inset:0;z-index:25;background:var(--bg);display:flex;flex-direction:column;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+.wv .bar{display:flex;align-items:center;gap:6px;padding:8px}
+.wv .bar button{height:40px;min-width:40px;border-radius:10px;background:var(--p2);border:1px solid var(--line);font-weight:700;font-size:16px}
+.wv .bar .x{background:var(--a);border-color:transparent;color:#fff;padding:0 14px;font-size:14px}
+.wv .bar input{flex:1;min-width:0;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--p);color:var(--t);padding:0 10px;font-size:14px;-webkit-user-select:text;user-select:text}
+.wv .pg{flex:1;overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative;touch-action:none;background:#000}
+.wv .pg img{max-width:100%;max-height:100%;width:auto;height:auto;display:block;user-select:none;-webkit-user-select:none;pointer-events:none}
+.wv .pg .wait{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--d)}
+.wv .tap{position:absolute;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;border:2px solid #fff;background:rgba(108,124,255,.45);pointer-events:none;animation:tp .45s ease-out forwards}
+@keyframes tp{to{transform:scale(1.8);opacity:0}}
+.wv .kb{display:flex;gap:6px;padding:8px}
+.wv .kb input{flex:1;min-width:0;height:44px;border-radius:10px;border:1px solid var(--line);background:var(--p);color:var(--t);padding:0 12px;font-size:16px;-webkit-user-select:text;user-select:text}
+.wv .kb button{height:44px;min-width:46px;border-radius:10px;background:var(--p2);border:1px solid var(--line);font-weight:700}
+.wv .hint{font-size:11.5px;color:var(--m);text-align:center;padding:0 8px 6px}
 </style>
 </head>
 <body>
@@ -117,6 +139,10 @@ textarea:focus{outline:none;border-color:var(--a)}
   <div class="offline hidden" id="offline">კავშირი გაწყდა — ვცდილობ ხელახლა…</div>
   <div class="live" id="live"><span class="tag">LIVE</span><span class="lab" id="lLab"></span><div class="txt empty" id="lTxt">ეკრანზე არაფერია</div><div class="blk hidden" id="lBlk">შავი ეკრანი</div></div>
   <div class="cnt"><b id="lName">—</b><span id="lN"></span></div>
+  <button class="webbtn hidden" id="webGo">🌐 გვერდის მართვა — დაჭერა, გადახვევა, წერა</button>
+  <div class="medbar hidden" id="med"><div class="r"><button id="mPlay">▶</button><span class="nm" id="mName"></span><button id="mBack">−10</button><button id="mFwd">+10</button></div>
+    <div class="r" style="margin-top:8px"><span class="tt" id="mT">0:00</span><input type="range" id="mSeek" min="0" max="1000" value="0"><span class="tt" id="mD">0:00</span></div>
+    <div class="r" style="margin-top:6px"><span class="tt">🔊</span><input type="range" id="mVol" min="0" max="100" value="100"></div></div>
   <div class="next"><span>შემდეგი</span><b id="nTxt">—</b></div>
 
   <div class="nav">
@@ -142,6 +168,12 @@ textarea:focus{outline:none;border-color:var(--a)}
     <div class="card"><h3>🎵 მუსიკა</h3><div class="mus" id="mus">არ უკრავს</div><div class="btns"><button class="btn pr" data-c="music" id="muGo">▶ დაკვრა</button><button class="btn" data-c="musicNext">შემდეგი</button><button class="btn" data-c="fade">ჩაქრობა</button></div></div>
   </section>
 </main>
+<div class="wv hidden" id="wv">
+  <div class="bar"><button id="wBack" title="უკან">‹</button><button id="wFwd" title="წინ">›</button><button id="wRel" title="განახლება">⟳</button><input id="wUrl" placeholder="მისამართი ან ძიება" enterkeyhint="go" autocapitalize="off" autocomplete="off"><button class="x" id="wClose">მზადაა</button></div>
+  <div class="pg" id="wPg"><div class="wait" id="wWait">გვერდი იტვირთება…</div><img id="wImg" alt=""></div>
+  <div class="hint">შეეხე — დაჭერა · გადაათრიე — გადახვევა · ორჯერ — ორმაგი დაჭერა · გადააბრუნე ტელეფონი, რომ დიდად ჩანდეს</div>
+  <div class="kb"><input id="wTxt" placeholder="აკრიფე აქ → გადავა გვერდზე" enterkeyhint="send" autocapitalize="off" autocomplete="off"><button id="wBs" title="წაშლა">⌫</button><button id="wEnt" title="Enter">↵</button><button id="wZo" title="დაპატარავება">−</button><button id="wZi" title="გადიდება">+</button></div>
+</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -227,7 +259,7 @@ textarea:focus{outline:none;border-color:var(--a)}
   setInterval(() => { if (NET && ws && ws.readyState === 1 && ws.last && Date.now() - ws.last > 35000) { try { ws.close(); } catch (e) {} } }, 5000);
   document.addEventListener('visibilitychange', () => { if (!document.hidden && (!ws || ws.readyState > 1)) { retry = 0; connect(); } });
   const ready = () => { retry = 0; $('#gate').classList.add('hidden'); $('#dot').className = 'dot on'; $('#offline').classList.add('hidden'); send({ t: 'hello' }); if (openItem) send({ t: 'slides', itemId: openItem }); };
-  const onMsg = (ev) => { let m; try { m = JSON.parse(ev.data); } catch (e) { return; } if (m.t === 'state') { st = m; render(); } if (m.t === 'slides') { slidesCache[m.itemId] = m; renderSlides(); } };
+  const onMsg = (ev) => { let m; try { m = JSON.parse(ev.data); } catch (e) { return; } if (m.t === 'state') { st = m; if (st.media) st.media.at = Date.now(); render(); } if (m.t === 'slides') { slidesCache[m.itemId] = m; renderSlides(); } if (m.t === 'webFrame') webFrame(m); if (m.t === 'webGone') webClose(); if (m.t === 'toast') toast(m.msg); };
   async function connect() {
     if (connecting || (ws && ws.readyState <= 1)) return;
     if (!NET) {
@@ -338,7 +370,100 @@ textarea:focus{outline:none;border-color:var(--a)}
     $('#tmShow').classList.toggle('pr', st.timer.show);
     $('#mus').textContent = st.music ? '🎵 ' + st.music.name : 'არ უკრავს';
     $('#muGo').textContent = st.music && st.music.playing ? '⏸ პაუზა' : '▶ დაკვრა';
+    // web page on screen → its own control panel; video on screen → play / seek / volume
+    $('#webGo').classList.toggle('hidden', !st.web);
+    if (!st.web && web.id) webClose();
+    renderMed();
   }
+  /* ---------- video on screen (file, YouTube, video on a site) ---------- */
+  let medDrag = false, volAt = 0;
+  function medNow(m) { return Math.min(m.d || Infinity, (m.t || 0) + (!m.p && m.at ? (Date.now() - m.at) / 1000 : 0)); }
+  function renderMed() {
+    const m = st && st.media;
+    $('#med').classList.toggle('hidden', !m);
+    if (!m) return;
+    $('#mPlay').textContent = m.p ? '▶' : '⏸';
+    $('#mName').textContent = (m.kind === 'yt' ? 'YouTube · ' : m.kind === 'web' ? 'საიტის ვიდეო · ' : 'ვიდეო · ') + (m.name || '');
+    const t = medNow(m);
+    if (!medDrag) { $('#mT').textContent = fmt(t); $('#mSeek').value = m.d ? Math.round((t / m.d) * 1000) : 0; }
+    $('#mD').textContent = fmt(m.d || 0);
+    if (Date.now() - volAt > 1500) $('#mVol').value = m.vol;
+  }
+  setInterval(() => { if (st && st.media && !st.media.p) renderMed(); }, 500);
+  $('#mPlay').onclick = () => { if (st && st.media) { st.media.p = !st.media.p; renderMed(); } send({ t: 'vToggle' }); };
+  const jump = (s) => { const m = st && st.media; if (!m || !m.d) return; const t = Math.max(0, Math.min(m.d, medNow(m) + s)); m.t = t; m.at = Date.now(); send({ t: 'vSeek', f: t / m.d }); renderMed(); };
+  $('#mBack').onclick = () => jump(-10);
+  $('#mFwd').onclick = () => jump(10);
+  $('#mSeek').oninput = () => { medDrag = true; const m = st && st.media; if (m && m.d) $('#mT').textContent = fmt(($('#mSeek').value / 1000) * m.d); };
+  $('#mSeek').onchange = () => { const m = st && st.media; send({ t: 'vSeek', f: $('#mSeek').value / 1000 }); if (m) { m.t = ($('#mSeek').value / 1000) * m.d; m.at = Date.now(); } setTimeout(() => (medDrag = false), 900); };
+  let volT = null;
+  $('#mVol').oninput = () => { volAt = Date.now(); clearTimeout(volT); volT = setTimeout(() => send({ t: 'vVol', v: +$('#mVol').value }), 90); };
+
+  /* ---------- web page: live picture, taps, drag-scroll, typing ---------- */
+  const web = { id: null, w: 1280, h: 720 };
+  function webOpen() {
+    if (!st || !st.web) return;
+    web.id = st.web.id;
+    $('#wv').classList.remove('hidden'); $('#wWait').classList.remove('hidden'); $('#wImg').removeAttribute('src');
+    send({ t: 'webView', id: web.id, on: true });
+  }
+  function webClose() {
+    if (web.id && ws && ws.readyState === 1) ws.send(JSON.stringify({ t: 'webView', id: web.id, on: false }));
+    web.id = null; $('#wv').classList.add('hidden');
+  }
+  function webFrame(m) {
+    if (!web.id || m.id !== web.id) return;
+    $('#wWait').classList.add('hidden');
+    $('#wImg').src = m.img;
+    if (document.activeElement !== $('#wUrl')) $('#wUrl').value = m.url || '';
+    $('#wBack').disabled = !m.back; $('#wFwd').disabled = !m.fwd;
+    web.zoom = m.zoom || 1;
+  }
+  const wIn = (ev) => { if (web.id && ws && ws.readyState === 1) ws.send(JSON.stringify({ t: 'webInput', id: web.id, ev })); };
+  $('#webGo').onclick = webOpen;
+  $('#wClose').onclick = webClose;
+  $('#wBack').onclick = () => send({ t: 'webNav', id: web.id, action: 'back' });
+  $('#wFwd').onclick = () => send({ t: 'webNav', id: web.id, action: 'forward' });
+  $('#wRel').onclick = () => send({ t: 'webNav', id: web.id, action: 'reload' });
+  $('#wZi').onclick = () => send({ t: 'webNav', id: web.id, action: 'zoom', value: Math.min(2.5, (web.zoom || 1) + 0.15) });
+  $('#wZo').onclick = () => send({ t: 'webNav', id: web.id, action: 'zoom', value: Math.max(0.5, (web.zoom || 1) - 0.15) });
+  $('#wUrl').addEventListener('keydown', (e) => { if (e.key === 'Enter') { send({ t: 'webNav', id: web.id, action: 'go', url: $('#wUrl').value }); $('#wUrl').blur(); } });
+  // typing: every letter goes to the page right away (into whatever field was tapped there)
+  $('#wTxt').addEventListener('input', (e) => { const v = $('#wTxt').value; if (v) { wIn({ type: 'text', text: v }); $('#wTxt').value = ''; } });
+  $('#wTxt').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); wIn({ type: 'key', key: 'Enter' }); } else if (e.key === 'Backspace' && !$('#wTxt').value) { e.preventDefault(); wIn({ type: 'key', key: 'Backspace' }); } });
+  $('#wBs').onclick = () => wIn({ type: 'key', key: 'Backspace' });
+  $('#wEnt').onclick = () => wIn({ type: 'key', key: 'Enter' });
+  // touch on the picture: tap = click, drag = scroll
+  (() => {
+    const pg = $('#wPg');
+    let s = null, lastTap = 0;
+    const rel = (e) => { const r = $('#wImg').getBoundingClientRect(); return { x: (e.clientX - r.left) / r.width, y: (e.clientY - r.top) / r.height, ok: e.clientY <= r.bottom && e.clientY >= r.top }; };
+    pg.addEventListener('pointerdown', (e) => { e.preventDefault(); s = { x: e.clientX, y: e.clientY, lx: e.clientX, ly: e.clientY, moved: false, t: Date.now(), acc: 0, accX: 0 }; try { pg.setPointerCapture(e.pointerId); } catch (x) {} });
+    pg.addEventListener('pointermove', (e) => {
+      if (!s) return;
+      if (!s.moved && Math.hypot(e.clientX - s.x, e.clientY - s.y) > 10) s.moved = true;
+      if (!s.moved) return;
+      const r = $('#wImg').getBoundingClientRect();
+      const k = 1280 / Math.max(1, r.width); // phone pixels → page pixels
+      s.acc += (s.ly - e.clientY) * k; s.accX += (s.lx - e.clientX) * k; s.lx = e.clientX; s.ly = e.clientY;
+      if (!s.sendT) s.sendT = setTimeout(() => { const p = rel({ clientX: s.x, clientY: s.y }); if (s.acc || s.accX) wIn({ type: 'wheel', x: p.x, y: p.y, dx: Math.round(s.accX), dy: Math.round(s.acc) }); s.acc = 0; s.accX = 0; s.sendT = null; }, 60);
+    });
+    pg.addEventListener('pointerup', (e) => {
+      if (!s) return;
+      const was = s; s = null;
+      if (was.moved) return;
+      const p = rel(e);
+      if (!p.ok) return;
+      const dbl = Date.now() - lastTap < 350;
+      lastTap = Date.now();
+      wIn({ type: 'move', x: p.x, y: p.y });
+      wIn({ type: 'down', x: p.x, y: p.y, count: dbl ? 2 : 1 });
+      wIn({ type: 'up', x: p.x, y: p.y, count: dbl ? 2 : 1 });
+      const d = document.createElement('div'); d.className = 'tap'; const pr = pg.getBoundingClientRect(); d.style.left = e.clientX - pr.left + 'px'; d.style.top = e.clientY - pr.top + 'px'; pg.appendChild(d); setTimeout(() => d.remove(), 500);
+      if (navigator.vibrate) navigator.vibrate(6);
+    });
+    pg.addEventListener('pointercancel', () => { s = null; });
+  })();
   let openEntry = null;
   function renderSlides() {
     const L = st && st.live;
