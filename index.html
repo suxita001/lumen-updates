@@ -120,6 +120,16 @@ textarea:focus{outline:none;border-color:var(--a)}
 .wv .kb input{flex:1;min-width:0;height:44px;border-radius:10px;border:1px solid var(--line);background:var(--p);color:var(--t);padding:0 12px;font-size:16px;-webkit-user-select:text;user-select:text}
 .wv .kb button{height:44px;min-width:46px;border-radius:10px;background:var(--p2);border:1px solid var(--line);font-weight:700}
 .wv .hint{font-size:11.5px;color:var(--m);text-align:center;padding:0 8px 6px}
+/* quick volume, adding from the phone, reconnect */
+.volbar{display:flex;align-items:center;gap:8px;background:var(--p);border:1px solid var(--line);border-radius:12px;padding:8px 10px;margin:0 0 12px}
+.volbar span{flex:1;min-width:0;font-size:12.5px;color:var(--d);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.volbar button{width:52px;height:44px;border-radius:11px;background:var(--p2);border:1px solid var(--line);font-size:22px;font-weight:800}
+.volbar b{min-width:52px;text-align:center;font-size:17px;font-variant-numeric:tabular-nums}
+.addbtn{display:block;width:100%;height:46px;margin:14px 0 4px;border-radius:12px;border:1px dashed var(--line);color:var(--a);font-weight:700}
+.inp{width:100%;height:44px;border-radius:10px;background:var(--p2);border:1px solid var(--line);color:var(--t);padding:0 12px;font-size:15px;margin-bottom:8px;-webkit-user-select:text;user-select:text}
+.inp:focus{outline:none;border-color:var(--a)}
+.chk{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--d);margin-top:8px}
+.offline button{margin-left:8px;color:#fff;background:var(--live);border-radius:8px;padding:4px 10px;font-weight:700;font-size:12px}
 </style>
 </head>
 <body>
@@ -136,9 +146,10 @@ textarea:focus{outline:none;border-color:var(--a)}
 
 <header><img src="icon.svg" alt=""><span class="nm">Lumen</span><span class="dot" id="dot"></span><span class="pl" id="plName"></span></header>
 <main>
-  <div class="offline hidden" id="offline">კავშირი გაწყდა — ვცდილობ ხელახლა…</div>
+  <div class="offline hidden" id="offline"><span id="offTxt">კავშირი გაწყდა — ვცდილობ ხელახლა…</span><button id="offGo">🔄 ხელახლა</button></div>
   <div class="live" id="live"><span class="tag">LIVE</span><span class="lab" id="lLab"></span><div class="txt empty" id="lTxt">ეკრანზე არაფერია</div><div class="blk hidden" id="lBlk">შავი ეკრანი</div></div>
   <div class="cnt"><b id="lName">—</b><span id="lN"></span></div>
+  <div class="volbar hidden" id="vb"><span id="vbLab">🔊 ხმა</span><button id="vbDn" aria-label="ჩაწევა">−</button><b id="vbVal">–</b><button id="vbUp" aria-label="აწევა">+</button></div>
   <button class="webbtn hidden" id="webGo">🌐 გვერდის მართვა — დაჭერა, გადახვევა, წერა</button>
   <div class="medbar hidden" id="med"><div class="r"><button id="mPlay">▶</button><span class="nm" id="mName"></span><button id="mBack">−10</button><button id="mFwd">+10</button></div>
     <div class="r" style="margin-top:8px"><span class="tt" id="mT">0:00</span><input type="range" id="mSeek" min="0" max="1000" value="0"><span class="tt" id="mD">0:00</span></div>
@@ -160,6 +171,18 @@ textarea:focus{outline:none;border-color:var(--a)}
   <section id="tPl"></section>
   <section id="tSl" class="hidden"><div class="slides-h"><b id="sName">—</b><button id="sFollow" class="hidden">← LIVE-ზე</button></div><div class="grid" id="sGrid"></div></section>
   <section id="tMore" class="hidden">
+    <div class="card" id="addCard"><h3>➕ დამატება სერვისში</h3>
+      <input class="inp" id="aUrl" placeholder="🔗 ლინკი — საიტი ან YouTube" inputmode="url" autocapitalize="off" autocomplete="off">
+      <div class="btns" style="margin-top:0"><button class="btn" id="aUrlGo">ლინკის დამატება</button></div>
+      <div style="height:14px"></div>
+      <input class="inp" id="aTitle" placeholder="📝 სათაური (არასავალდებულო)">
+      <textarea id="aText" placeholder="ტექსტი / სიმღერა — სლაიდები ცარიელი ხაზით გაყავი"></textarea>
+      <div class="btns"><button class="btn" id="aTextGo">დამატება</button><button class="btn pr" id="aTextLive">დამატება და ეკრანზე</button></div>
+      <div style="height:14px"></div>
+      <input type="file" id="aPhoto" accept="image/*" class="hidden">
+      <div class="btns" style="margin-top:0"><button class="btn" id="aPhotoGo">📷 ფოტო ტელეფონიდან</button></div>
+      <label class="chk"><input type="checkbox" id="aPhotoLive"> მაშინვე ეკრანზე</label>
+    </div>
     <div class="card"><h3>✍️ სწრაფი ტექსტი</h3><textarea id="qt" placeholder="დაწერე — და გაგზავნე ეკრანზე"></textarea><div class="btns"><button class="btn pr" id="qtGo">ეკრანზე</button></div></div>
     <div class="card"><h3>⏱ ტაიმერი</h3><div class="tm" id="tm">0:00</div>
       <div class="pre"><button data-tm="60">1წ</button><button data-tm="300">5წ</button><button data-tm="600">10წ</button><button data-tm="900">15წ</button></div>
@@ -258,7 +281,7 @@ textarea:focus{outline:none;border-color:var(--a)}
   // dead-link watchdog: the computer sends a heartbeat every ~15 s
   setInterval(() => { if (NET && ws && ws.readyState === 1 && ws.last && Date.now() - ws.last > 35000) { try { ws.close(); } catch (e) {} } }, 5000);
   document.addEventListener('visibilitychange', () => { if (!document.hidden && (!ws || ws.readyState > 1)) { retry = 0; connect(); } });
-  const ready = () => { retry = 0; $('#gate').classList.add('hidden'); $('#dot').className = 'dot on'; $('#offline').classList.add('hidden'); send({ t: 'hello' }); if (openItem) send({ t: 'slides', itemId: openItem }); };
+  const ready = () => { retry = 0; woke = false; $('#offTxt').textContent = 'კავშირი გაწყდა — ვცდილობ ხელახლა…'; $('#gate').classList.add('hidden'); $('#dot').className = 'dot on'; $('#offline').classList.add('hidden'); send({ t: 'hello' }); if (openItem) send({ t: 'slides', itemId: openItem }); };
   const onMsg = (ev) => { let m; try { m = JSON.parse(ev.data); } catch (e) { return; } if (m.t === 'state') { st = m; if (st.media) st.media.at = Date.now(); render(); } if (m.t === 'slides') { slidesCache[m.itemId] = m; renderSlides(); } if (m.t === 'webFrame') webFrame(m); if (m.t === 'webGone') webClose(); if (m.t === 'toast') toast(m.msg); };
   async function connect() {
     if (connecting || (ws && ws.readyState <= 1)) return;
@@ -316,7 +339,26 @@ textarea:focus{outline:none;border-color:var(--a)}
       later();
     };
   }
-  function later() { retry++; setTimeout(connect, Math.min(5000, 600 * retry)); }
+  let woke = false;
+  function later() {
+    retry++;
+    if (NET && retry === 4 && !woke) { woke = true; wake(); }
+    setTimeout(connect, Math.min(5000, 600 * retry));
+  }
+  $('#offGo').onclick = () => { retry = 0; woke = false; netUrl = null; try { ws && ws.close(); } catch (e) {} ws = null; connecting = false; $('#offTxt').textContent = 'ვუკავშირდები…'; connect(); };
+  // Lumen closed on the main computer? its helper starts it when it gets a note signed with the password key
+  async function wake() {
+    try {
+      const n = NS.get();
+      if (!n.id || !n.key) return;
+      const topic = 'lumen-wake-' + buf2hex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('lumen-wake-v1|' + n.id))).slice(0, 32);
+      const wk = hex2buf(await hmac(hex2buf(n.key), 'lumen-wake'));
+      const ts = Date.now(), nonce = buf2hex(crypto.getRandomValues(new Uint8Array(12)));
+      const mac = await hmac(wk, 'wake|' + ts + '|' + nonce);
+      const r = await fetch((window.LUMEN_NTFY || 'https://ntfy.sh/') + topic, { method: 'POST', body: JSON.stringify({ ts, n: nonce, mac, from: 'phone' }) });
+      if (r.ok) { $('#offTxt').textContent = 'მთავარზე Lumen-ს ვრთავ… (~30 წმ)'; toast('⏻ მთავარზე Lumen-ს ვრთავ'); }
+    } catch (e) {}
+  }
   document.addEventListener('visibilitychange', () => { if (!document.hidden && (!ws || ws.readyState > 1)) connect(); });
 
   function render() {
@@ -361,6 +403,8 @@ textarea:focus{outline:none;border-color:var(--a)}
       };
       box.appendChild(r);
     });
+    box.insertAdjacentHTML('beforeend', '<button class="addbtn" id="plAdd">➕ ლინკი / ტექსტი / ფოტო</button>');
+    $('#plAdd').onclick = () => { setTab('more'); $('#addCard').scrollIntoView({ block: 'start' }); };
     // follow live
     if (!openItem && L && L.itemId && !slidesCache[L.itemId]) send({ t: 'slides', itemId: L.itemId });
     renderSlides();
@@ -374,7 +418,49 @@ textarea:focus{outline:none;border-color:var(--a)}
     $('#webGo').classList.toggle('hidden', !st.web);
     if (!st.web && web.id) webClose();
     renderMed();
+    renderVol();
   }
+  /* ---------- quick volume: whatever is playing (video on screen, otherwise music) ---------- */
+  let vbAt = 0, vbT = null, vbLocal = null;
+  const vbTarget = () => { if (!st) return null; const m = st.media, mu = st.music; if (m && !(mu && mu.playing)) return { kind: 'v', v: m.vol, lab: '🎬 ვიდეოს ხმა' }; if (mu) return { kind: 'm', v: mu.vol, lab: '🎵 ' + (mu.name || 'მუსიკა') }; return null; };
+  function renderVol() {
+    const t = vbTarget();
+    $('#vb').classList.toggle('hidden', !t);
+    if (!t) return;
+    $('#vbLab').textContent = t.lab;
+    if (Date.now() - vbAt > 1500 || vbLocal == null) vbLocal = t.v;
+    $('#vbVal').textContent = Math.round(vbLocal) + '%';
+  }
+  const vbStep = (d) => {
+    const t = vbTarget(); if (!t) return;
+    vbLocal = Math.max(0, Math.min(100, Math.round(((Date.now() - vbAt > 1500 ? t.v : vbLocal) + d) / 5) * 5));
+    vbAt = Date.now(); $('#vbVal').textContent = vbLocal + '%';
+    clearTimeout(vbT); vbT = setTimeout(() => send(t.kind === 'v' ? { t: 'vVol', v: vbLocal } : { t: 'musicVol', v: vbLocal }), 120);
+  };
+  $('#vbUp').onclick = () => vbStep(10);
+  $('#vbDn').onclick = () => vbStep(-10);
+
+  /* ---------- adding from the phone ---------- */
+  $('#aUrlGo').onclick = () => { const v = $('#aUrl').value.trim(); if (!v) { $('#aUrl').focus(); return; } send({ t: 'url', url: v }); $('#aUrl').value = ''; toast('🔗 იგზავნება — სერვისის ბოლოში გამოჩნდება'); };
+  const addText = (live) => { const v = $('#aText').value.trim(); if (!v) { $('#aText').focus(); return; } send({ t: 'songNew', title: $('#aTitle').value.trim(), text: v, live }); $('#aText').value = ''; $('#aTitle').value = ''; toast(live ? '📝 დაემატა და გადის ეკრანზე' : '📝 დაემატა სერვისში'); };
+  $('#aTextGo').onclick = () => addText(false);
+  $('#aTextLive').onclick = () => addText(true);
+  $('#aPhotoGo').onclick = () => $('#aPhoto').click();
+  $('#aPhoto').onchange = async () => {
+    const f = $('#aPhoto').files[0]; $('#aPhoto').value = '';
+    if (!f) return;
+    toast('📷 ფოტო იგზავნება…');
+    try {
+      // shrink on the phone first: big camera photos would be slow over the internet
+      const bmp = await createImageBitmap(f);
+      const k = Math.min(1, 1920 / Math.max(bmp.width, bmp.height));
+      const c = document.createElement('canvas'); c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
+      c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+      const data = c.toDataURL('image/jpeg', 0.85);
+      send({ t: 'photo', name: (f.name || 'ფოტო').replace(/\.[^.]+$/, '') + '.jpg', data, live: $('#aPhotoLive').checked });
+      toast($('#aPhotoLive').checked ? '📷 გაიგზავნა — გადის ეკრანზე' : '📷 გაიგზავნა — სერვისის ბოლოშია');
+    } catch (e) { toast('ფოტო ვერ წავიკითხე'); }
+  };
   /* ---------- video on screen (file, YouTube, video on a site) ---------- */
   let medDrag = false, volAt = 0;
   function medNow(m) { return Math.min(m.d || Infinity, (m.t || 0) + (!m.p && m.at ? (Date.now() - m.at) / 1000 : 0)); }
