@@ -121,6 +121,9 @@ textarea:focus{outline:none;border-color:var(--a)}
 .wv .kb button{height:44px;min-width:46px;border-radius:10px;background:var(--p2);border:1px solid var(--line);font-weight:700}
 .wv .hint{font-size:11.5px;color:var(--m);text-align:center;padding:0 8px 6px}
 /* quick volume, adding from the phone, reconnect */
+.outbtn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:48px;margin:0 0 12px;border-radius:12px;font-weight:800;font-size:15px;background:var(--p2);border:1px solid var(--line)}
+.outbtn.on{background:transparent;border-color:var(--live);color:var(--live)}
+.outbtn.off{background:var(--live);border-color:var(--live);color:#fff}
 .volbar{display:flex;align-items:center;gap:8px;background:var(--p);border:1px solid var(--line);border-radius:12px;padding:8px 10px;margin:0 0 12px}
 .volbar span{flex:1;min-width:0;font-size:12.5px;color:var(--d);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .volbar button{width:52px;height:44px;border-radius:11px;background:var(--p2);border:1px solid var(--line);font-size:22px;font-weight:800}
@@ -149,6 +152,7 @@ textarea:focus{outline:none;border-color:var(--a)}
   <div class="offline hidden" id="offline"><span id="offTxt">კავშირი გაწყდა — ვცდილობ ხელახლა…</span><button id="offGo">🔄 ხელახლა</button></div>
   <div class="live" id="live"><span class="tag">LIVE</span><span class="lab" id="lLab"></span><div class="txt empty" id="lTxt">ეკრანზე არაფერია</div><div class="blk hidden" id="lBlk">შავი ეკრანი</div></div>
   <div class="cnt"><b id="lName">—</b><span id="lN"></span></div>
+  <button class="outbtn hidden" id="outGo"></button>
   <div class="volbar hidden" id="vb"><span id="vbLab">🔊 ხმა</span><button id="vbDn" aria-label="ჩაწევა">−</button><b id="vbVal">–</b><button id="vbUp" aria-label="აწევა">+</button></div>
   <button class="webbtn hidden" id="webGo">🌐 გვერდის მართვა — დაჭერა, გადახვევა, წერა</button>
   <div class="medbar hidden" id="med"><div class="r"><button id="mPlay">▶</button><span class="nm" id="mName"></span><button id="mBack">−10</button><button id="mFwd">+10</button></div>
@@ -419,7 +423,18 @@ textarea:focus{outline:none;border-color:var(--a)}
     if (!st.web && web.id) webClose();
     renderMed();
     renderVol();
+    // output (TV) on / off
+    const ob = $('#outGo');
+    ob.classList.toggle('hidden', typeof st.out !== 'boolean');
+    ob.classList.toggle('on', !!st.out); ob.classList.toggle('off', !st.out);
+    ob.textContent = st.out ? '📺 ეკრანი ჩართულია — გათიშვა' : '📺 ეკრანზე გამოტანა';
   }
+  $('#outGo').onclick = () => {
+    if (!st) return;
+    if (st.out && !confirm('ტელევიზორზე/პროექტორზე გამოსახულება გაითიშოს?')) return;
+    send({ t: 'output', on: !st.out });
+  };
+
   /* ---------- quick volume: whatever is playing (video on screen, otherwise music) ---------- */
   let vbAt = 0, vbT = null, vbLocal = null;
   const vbTarget = () => { if (!st) return null; const m = st.media, mu = st.music; if (m && !(mu && mu.playing)) return { kind: 'v', v: m.vol, lab: '🎬 ვიდეოს ხმა' }; if (mu) return { kind: 'm', v: mu.vol, lab: '🎵 ' + (mu.name || 'მუსიკა') }; return null; };
